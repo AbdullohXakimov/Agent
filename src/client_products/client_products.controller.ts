@@ -34,10 +34,10 @@ export class ClientProductsController {
   }
 
   @UseGuards(ClientGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string, @Req() req: any) {
+  @Get('shopProducts')
+  findOne(@Req() req: any) {
     const user = req.client;
-    return this.clientProductsService.findOne(+id, user);
+    return this.clientProductsService.findOne( user);
   }
   @UseGuards(AdminGuard)
   @Get('admins/:id')
@@ -47,7 +47,7 @@ export class ClientProductsController {
   }
 
   @UseGuards(ClientGuard)
-  @Patch(':id')
+  @Patch(":id")
   update(
     @Param('id') id: string,
     @Body() updateClientProductDto: UpdateClientProductDto,

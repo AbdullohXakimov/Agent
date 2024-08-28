@@ -46,10 +46,12 @@ export class AdminsController {
 
   @Get('set-test-cookie')
   setTestCookie(@Res() res: Response) {
+    console.log('setcoookieee');
+
     res.cookie('test_cookie', 'test_value', {
       httpOnly: true,
       secure: false,
-      sameSite: 'lax',
+      sameSite: 'none',
     });
     res.send('Test cookie set');
   }

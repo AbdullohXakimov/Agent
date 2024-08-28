@@ -8,14 +8,14 @@ import {
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsNotEmpty } from 'class-validator';
-import { Client } from '../../clients/entities/client.entity';
 import { Product } from '../../products/entities/product.entity';
+import { Order } from './order.entity';
 
-@Table({ modelName: 'ClientProducts' })
-export class ClientProduct extends Model<ClientProduct> {
+@Table({ modelName: 'OrderItems' })
+export class OrderItem extends Model<OrderItem> {
   @ApiProperty({
     example: 1,
-    description: 'Unique identifier for the client-product record',
+    description: 'Unique identifier for the order item',
   })
   @Column({
     autoIncrement: true,
@@ -26,16 +26,16 @@ export class ClientProduct extends Model<ClientProduct> {
 
   @ApiProperty({
     example: 1,
-    description: 'Unique identifier for the client',
+    description: 'Unique identifier for the order',
   })
   @IsNumber()
   @IsNotEmpty()
-  @ForeignKey(() => Client)
+  @ForeignKey(() => Order)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  clientId: number;
+  orderId: number;
 
   @ApiProperty({
     example: 1,
@@ -52,7 +52,7 @@ export class ClientProduct extends Model<ClientProduct> {
 
   @ApiProperty({
     example: 5,
-    description: 'Amount of the product for the client',
+    description: 'Amount of the product ordered',
   })
   @IsNumber()
   @IsNotEmpty()
@@ -62,10 +62,21 @@ export class ClientProduct extends Model<ClientProduct> {
   })
   amount: number;
 
-  // Associations
-  @BelongsTo(() => Client, { foreignKey: 'clientId' })
-  client: Client;
+  @ApiProperty({
+    example: 50,
+    description: 'Total price for the order item',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+  })
+  total: number;
 
-  @BelongsTo(() => Product, { foreignKey: 'productId' })
+  @BelongsTo(() => Product)
   product: Product;
+
+  @BelongsTo(() => Order)
+  order: Order;
 }

@@ -145,6 +145,8 @@ export class ClientsService {
   // Handle client login
   async login(loginClientDto: LoginClientDto, res: Response) {
     const { email, password } = loginClientDto;
+    console.log("Keldi");
+    
 
     const client = await this.clientRepo.findOne({ where: { email } });
 
@@ -152,8 +154,13 @@ export class ClientsService {
 
     if (!client.is_active)
       throw new BadRequestException('Client is not active');
-
+    
+    console.log(password);
+    console.log(client.password);
+    
+    
     const isMatch = await bcrypt.compare(password, client.password);
+    console.log("Ismatch: ", isMatch);
 
     if (!isMatch) throw new BadRequestException('Incorrect password');
 

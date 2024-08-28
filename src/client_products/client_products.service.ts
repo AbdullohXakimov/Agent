@@ -76,26 +76,30 @@ export class ClientProductsService {
     return this.clientProductModel.create(createClientProductDto);
   }
 
-  async findOne(id: number, user: { id: number }): Promise<ClientProduct> {
-    const clientProduct = await this.clientProductModel.findByPk(id);
+  async findOne(user: { id: number }): Promise<ClientProduct[]> {
+    console.log('UserID:', user);
+
+    const clientProduct = await this.clientProductModel.findAll({
+      where: { clientId: user.id },
+      include: { all: true },
+    });
+    console.log(clientProduct);
+
     if (!clientProduct) {
-      throw new NotFoundException(`ClientProduct with ID ${id} not found`);
+      throw new NotFoundException(`ClientProduct with ID ${user.id} not found`);
     }
 
     // Ensure that the requesting client is the owner of the clientProduct or an admin
-    if (clientProduct.clientId !== user.id) {
-      log(clientProduct.clientId);
-      log(user.id);
-      throw new ForbiddenException('You are not allowed to view this product.');
-    }
 
     return clientProduct;
   }
 
   async findOneAdmin(id: number): Promise<ClientProduct[]> {
     console.log(id);
-    
-    const clientProduct = await this.clientProductModel.findAll({where: {clientId: id}})
+
+    const clientProduct = await this.clientProductModel.findAll({
+      where: { clientId: id },
+    });
     return clientProduct;
   }
 
@@ -110,6 +114,8 @@ export class ClientProductsService {
     }
 
     // Ensure that the requesting client is the owner of the clientProduct or an admin
+    console.log("Something!!");
+    
     if (clientProduct.clientId !== user.id) {
       throw new ForbiddenException(
         'You are not allowed to update this product.',
@@ -126,6 +132,10 @@ export class ClientProductsService {
 
     // Get the amount change (e.g., +100 or -200)
     const changeInAmount = updateClientProductDto.amount;
+    console.log("CHANGE AMOUNT",changeInAmount);
+    console.log(updateClientProductDto);
+    
+    
 
     if (changeInAmount > 0) {
       // If the amount is positive, we are adding to the client's shop
@@ -157,13 +167,14 @@ export class ClientProductsService {
     // Save the updated client and product models
     await product.save();
     await clientProduct.save();
+    console.log(clientProduct.amount);
+
+    
 
     return clientProduct;
   }
 
-  async remove(
-    id: number,
-  ): Promise<void> {
+  async remove(id: number): Promise<void> {
     const clientProduct = await this.clientProductModel.findByPk(id);
     if (!clientProduct) {
       throw new NotFoundException(`ClientProduct with ID ${id} not found`);

@@ -9,6 +9,7 @@ import { ClientProductsModule } from './client_products/client_products.module';
 import { ClientProduct } from './client_products/entities/client_product.entity';
 import { AdminsModule } from './admins/admins.module';
 import { Admin } from './admins/entities/admin.entity';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { Admin } from './admins/entities/admin.entity';
     ClientsModule,
     ClientProductsModule,
     AdminsModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],
