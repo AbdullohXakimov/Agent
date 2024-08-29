@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
@@ -6,12 +10,15 @@ import { CreateOrderDTO } from './dto/create-order.dto';
 import { UpdateOrderStatusDTO } from './dto/update-order.dto';
 import { Product } from '../products/entities/product.entity';
 import { Client } from '../clients/entities/client.entity';
+import { v4 } from 'uuid';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order) private orderModel: typeof Order,
     @InjectModel(OrderItem) private orderItemModel: typeof OrderItem,
+    private readonly mailService: MailService,
   ) {}
 
   // Create a new order
@@ -22,12 +29,14 @@ export class OrderService {
     console.log('KELDI');
 
     const { finished, totalPrice, orders } = createOrderDTO;
+    const activation_link = v4();
 
     // Create a new order
     const order = await this.orderModel.create({
       clientId,
       finished,
       totalPrice,
+      activation_link,
     });
 
     console.log('KEldi:', order);
@@ -39,8 +48,23 @@ export class OrderService {
         orderId: order.id,
       });
     }
-
     return order;
+  }
+
+  async activate(link: string) {
+    if (!link) throw new BadRequestException('Activation link not found');
+    console.log(link);
+    const updated = await this.orderModel.update(
+      { finished: true },
+      { where: { activation_link: link }, returning: true },
+    );
+    if (!updated[1][0])
+      throw new BadRequestException('The order already finished');
+    const response = {
+      message: 'ishladi 🙌🙌 finished',
+      finished: updated[1][0].finished,
+    };
+    return response;
   }
 
   // Get all orders
@@ -52,7 +76,7 @@ export class OrderService {
           include: [Product], // Include Product model here
           attributes: ['id', 'amount', 'total'], // Select specific attributes from OrderItem
         },
-        Client
+        Client,
       ],
     });
   }
@@ -67,6 +91,7 @@ export class OrderService {
           include: [Product], // Include Product model here
           attributes: ['id', 'amount', 'total'], // Select specific attributes from OrderItem
         },
+        Client,
       ],
     });
 
@@ -83,7 +108,10 @@ export class OrderService {
     updateOrderStatusDTO: UpdateOrderStatusDTO,
   ): Promise<Order> {
     const order = await this.getOrderById(id);
-    order.finished = updateOrderStatusDTO.finished;
+    await this.mailService.sendMailtoUserToConfirm(order);
+    console.log(order.client.email);
+
+    // order.finished = updateOrderStatusDTO.finished;
     return order.save();
   }
 
@@ -103,7 +131,7 @@ export class OrderService {
           include: [Product], // Include Product model here
           attributes: ['id', 'amount', 'total'], // Select specific attributes from OrderItem
         },
-        Client
+        Client,
       ],
     });
     console.log('Orders with products:', data);

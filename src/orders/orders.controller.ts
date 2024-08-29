@@ -25,10 +25,7 @@ export class OrderController {
   // Create a new order
   @UseGuards(ClientGuard)
   @Post()
-  async createOrder(
-    @Body() createOrderDTO: CreateOrderDTO,
-    @Req() req: any,
-  ){
+  async createOrder(@Body() createOrderDTO: CreateOrderDTO, @Req() req: any) {
     console.log('oKA');
     const user = req.client;
     return this.orderService.createOrder(user.id, createOrderDTO);
@@ -86,6 +83,11 @@ export class OrderController {
   async getUnfinishedOrdersClient(@Req() req: any): Promise<Order[]> {
     const user = req.client;
     return this.orderService.getUnfinishedOrdersClient(user.id);
+  }
+
+  @Get('confirm/:link')
+  activate(@Param('link') link: string) {
+    return this.orderService.activate(link);
   }
 
   // Get finished orders

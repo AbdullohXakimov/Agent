@@ -53,6 +53,11 @@ export class Order extends Model<Order> {
   })
   finished: boolean;
 
+  @Column({
+    type: DataType.STRING,
+  })
+  activation_link: string;
+
   @ApiProperty({
     example: 100.5,
     description: 'Total price for the order',

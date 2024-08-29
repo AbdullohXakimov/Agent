@@ -6,9 +6,10 @@ import { OrderItem } from './entities/order-item.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { OrderController } from './orders.controller';
 import { OrderService } from './orders.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Order, OrderItem]), JwtModule],
+  imports: [SequelizeModule.forFeature([Order, OrderItem]), JwtModule, MailModule],
   controllers: [OrderController],
   providers: [OrderService],
 })

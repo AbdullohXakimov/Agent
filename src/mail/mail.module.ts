@@ -19,7 +19,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
           },
         },
         defaults: {
-          from: `"Stadium" <${config.get('MAILER_HOST')}>`,
+          from: `"Agent product delivery" <${config.get('MAILER_HOST')}>`,
         },
         template: {
           dir: join(process.cwd(), 'src', 'mail', 'templates'),
