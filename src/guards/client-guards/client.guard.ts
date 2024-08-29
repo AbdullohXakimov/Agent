@@ -19,10 +19,8 @@ export class ClientGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers.authorization;
     if (!authHeader) throw new UnauthorizedException('User is unauthorized');
-
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
-
     if (bearer != 'Bearer' || !token)
       throw new UnauthorizedException('User is unauthorized');
 
@@ -47,10 +45,8 @@ export class ClientGuard implements CanActivate {
       if (!user.is_active) {
         throw new BadRequestException('Client is not active');
       }
-
+      console.log('HAmmasi yaxshi22');
       req.client = user;
-      log(req.client)
-
       return true;
     }
     return verify(token, this.jwrService);

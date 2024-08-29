@@ -211,16 +211,15 @@ export class ClientsService {
     return response;
   }
 
-  async refreshToken(userId: number, refreshToken: string, res: Response) {
+  async refreshToken(refreshToken: string, res: Response) {
     const decodedToken = await this.jwtService.decode(refreshToken);
     console.log(decodedToken);
-    console.log(userId);
 
-    if (!decodedToken || userId != decodedToken['id']) {
+    if (!decodedToken) {
       throw new BadRequestException('Client not matched');
     }
 
-    const client = await this.clientRepo.findByPk(userId);
+    const client = await this.clientRepo.findByPk(decodedToken['id']);
     if (!client || !client.refresh_token) {
       throw new BadRequestException('Refresh token not found');
     }

@@ -14,9 +14,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-
- 
-
   const config = new DocumentBuilder()
     .setTitle('Library')
     .setDescription('The project is for selling books')
@@ -26,6 +23,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(3000);
+  await app.listen(3000, () => console.log('started'));
 }
 bootstrap();

@@ -148,7 +148,7 @@ export class ClientsController {
     return this.clientsService.logOut(refreshToken, res);
   }
 
-  @Post(':id/refresh')
+  @Post('refresh')
   @ApiOperation({ summary: 'Refresh client token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   refreshToken(
@@ -156,6 +156,6 @@ export class ClientsController {
     @CookieGetter('refresh_token') refreshToken: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.clientsService.refreshToken(id, refreshToken, res);
+    return this.clientsService.refreshToken(refreshToken, res);
   }
 }

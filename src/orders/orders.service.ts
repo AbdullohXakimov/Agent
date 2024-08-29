@@ -13,8 +13,10 @@ export class OrderService {
   ) {}
 
   // Create a new order
-  async createOrder(createOrderDTO: CreateOrderDTO): Promise<Order> {
-    const { clientId, finished, totalPrice, orders } = createOrderDTO;
+  async createOrder(clientId: number, createOrderDTO: CreateOrderDTO): Promise<Order> {
+    console.log("KELDI");
+    
+    const {finished, totalPrice, orders } = createOrderDTO;
 
     // Create a new order
     const order = await this.orderModel.create({
@@ -22,6 +24,9 @@ export class OrderService {
       finished,
       totalPrice,
     });
+
+    console.log("KEldi:", order);
+    
 
     // Create order items
     for (const orderItem of orders) {

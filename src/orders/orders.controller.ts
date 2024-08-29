@@ -7,26 +7,34 @@ import {
   Put,
   Delete,
   Patch,
-  Req,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { OrderService } from './orders.service';
 import { CreateOrderDTO } from './dto/create-order.dto';
 import { Order } from './entities/order.entity';
 import { UpdateOrderStatusDTO } from './dto/update-order.dto';
 import { ClientGuard } from '../guards/client-guards/client.guard';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Orders')
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   // Create a new order
+  @UseGuards(ClientGuard)
   @Post()
-  async createOrder(@Body() createOrderDTO: CreateOrderDTO): Promise<Order> {
-    return this.orderService.createOrder(createOrderDTO);
+  async createOrder(
+    @Body() createOrderDTO: CreateOrderDTO,
+    @Req() req: any,
+  ){
+    console.log('oKA');
+    const user = req.client;
+    return this.orderService.createOrder(user.id, createOrderDTO);
   }
 
   // Get all orders
+  @UseGuards(ClientGuard)
   @Get()
   async getAllOrders(): Promise<Order[]> {
     return this.orderService.getAllOrders();

@@ -10,10 +10,6 @@ import { Type } from 'class-transformer';
 import { CreateOrderItemDTO } from './create-order-item.dto'; // Make sure to import the CreateOrderItemDTO
 
 export class CreateOrderDTO {
-  @ApiProperty({ example: 1 })
-  @IsNumber()
-  @IsNotEmpty()
-  clientId: number;
 
   @ApiProperty({ type: [CreateOrderItemDTO] })
   @IsArray()
