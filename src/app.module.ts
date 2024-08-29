@@ -10,6 +10,8 @@ import { ClientProduct } from './client_products/entities/client_product.entity'
 import { AdminsModule } from './admins/admins.module';
 import { Admin } from './admins/entities/admin.entity';
 import { OrdersModule } from './orders/orders.module';
+import { OrderItem } from './orders/entities/order-item.entity';
+import { Order } from './orders/entities/order.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { OrdersModule } from './orders/orders.module';
       password: process.env.PASSWORD,
       database: process.env.DB,
       models: [
-        Product, Client, ClientProduct, Admin
+        Product, Client, ClientProduct, Admin, OrderItem, Order
       ],
       autoLoadModels: true,
       sync: { alter: true },

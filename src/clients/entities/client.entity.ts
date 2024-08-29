@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { ClientProduct } from '../../client_products/entities/client_product.entity';
 import { Product } from '../../products/entities/product.entity';
+import { Order } from '../../orders/entities/order.entity';
 
 @Table({ modelName: 'Clients' })
 export class Client extends Model<Client> {
@@ -124,4 +125,7 @@ export class Client extends Model<Client> {
   })
   @HasMany(() => Product, 'productId')
   products: Product[];
+
+  @HasMany(() => Order)
+  orders: Order[];
 }

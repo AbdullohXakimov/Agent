@@ -10,6 +10,7 @@ import {
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Client } from '../../clients/entities/client.entity';
+import { OrderItem } from '../../orders/entities/order-item.entity';
 
 
 @Table({ modelName: 'Products' })
@@ -58,4 +59,7 @@ export class Product extends Model<Product> {
   })
   @HasMany(() => Client, 'clientId')
   clients: Client[];
+
+  @HasMany(() => OrderItem,'productId')
+  orderItem: OrderItem[];
 }

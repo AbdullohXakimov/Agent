@@ -16,6 +16,7 @@ import { Order } from './entities/order.entity';
 import { UpdateOrderStatusDTO } from './dto/update-order.dto';
 import { ClientGuard } from '../guards/client-guards/client.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { AdminGuard } from '../guards/admin-guards/admin.guard';
 @ApiTags('Orders')
 @Controller('orders')
 export class OrderController {
@@ -34,7 +35,7 @@ export class OrderController {
   }
 
   // Get all orders
-  @UseGuards(ClientGuard)
+  @UseGuards(AdminGuard)
   @Get()
   async getAllOrders(): Promise<Order[]> {
     return this.orderService.getAllOrders();

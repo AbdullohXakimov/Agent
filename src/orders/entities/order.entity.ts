@@ -1,7 +1,17 @@
-import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  HasMany,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsNotEmpty } from 'class-validator';
 import { OrderItem } from './order-item.entity';
+import { Client } from '../../clients/entities/client.entity';
+
 
 @Table({ modelName: 'Orders' })
 export class Order extends Model<Order> {
@@ -22,11 +32,15 @@ export class Order extends Model<Order> {
   })
   @IsNumber()
   @IsNotEmpty()
+  @ForeignKey(() => Client)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
   clientId: number;
+
+  @BelongsTo(() => Client)
+  client: Client;
 
   @ApiProperty({
     example: false,
@@ -52,5 +66,5 @@ export class Order extends Model<Order> {
   totalPrice: number;
 
   @HasMany(() => OrderItem)
-  orderItems: OrderItem[];
+  orderItem: OrderItem[];
 }

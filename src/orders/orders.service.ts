@@ -4,6 +4,8 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDTO } from './dto/create-order.dto';
 import { UpdateOrderStatusDTO } from './dto/update-order.dto';
+import { Product } from '../products/entities/product.entity';
+import { Client } from '../clients/entities/client.entity';
 
 @Injectable()
 export class OrderService {
@@ -13,10 +15,13 @@ export class OrderService {
   ) {}
 
   // Create a new order
-  async createOrder(clientId: number, createOrderDTO: CreateOrderDTO): Promise<Order> {
-    console.log("KELDI");
-    
-    const {finished, totalPrice, orders } = createOrderDTO;
+  async createOrder(
+    clientId: number,
+    createOrderDTO: CreateOrderDTO,
+  ): Promise<Order> {
+    console.log('KELDI');
+
+    const { finished, totalPrice, orders } = createOrderDTO;
 
     // Create a new order
     const order = await this.orderModel.create({
@@ -25,8 +30,7 @@ export class OrderService {
       totalPrice,
     });
 
-    console.log("KEldi:", order);
-    
+    console.log('KEldi:', order);
 
     // Create order items
     for (const orderItem of orders) {
@@ -42,7 +46,14 @@ export class OrderService {
   // Get all orders
   async getAllOrders(): Promise<Order[]> {
     return this.orderModel.findAll({
-      include: [OrderItem],
+      include: [
+        {
+          model: OrderItem,
+          include: [Product], // Include Product model here
+          attributes: ['id', 'amount', 'total'], // Select specific attributes from OrderItem
+        },
+        Client
+      ],
     });
   }
 
@@ -50,7 +61,13 @@ export class OrderService {
   async getOrderById(id: number): Promise<Order> {
     const order = await this.orderModel.findOne({
       where: { id },
-      include: [OrderItem],
+      include: [
+        {
+          model: OrderItem,
+          include: [Product], // Include Product model here
+          attributes: ['id', 'amount', 'total'], // Select specific attributes from OrderItem
+        },
+      ],
     });
 
     if (!order) {
@@ -78,10 +95,19 @@ export class OrderService {
 
   // Get orders by client ID
   async getOrdersByClientId(clientId: number): Promise<Order[]> {
-    return this.orderModel.findAll({
+    const data = await this.orderModel.findAll({
       where: { clientId },
-      include: [OrderItem],
+      include: [
+        {
+          model: OrderItem,
+          include: [Product], // Include Product model here
+          attributes: ['id', 'amount', 'total'], // Select specific attributes from OrderItem
+        },
+        Client
+      ],
     });
+    console.log('Orders with products:', data);
+    return data;
   }
 
   // Get unfinished orders
@@ -94,7 +120,7 @@ export class OrderService {
 
   async getUnfinishedOrdersClient(clientId: number): Promise<Order[]> {
     return this.orderModel.findAll({
-      where: { finished: false, clientId: clientId},
+      where: { finished: false, clientId: clientId },
       include: [OrderItem],
     });
   }

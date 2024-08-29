@@ -11,7 +11,7 @@ import { IsNumber, IsNotEmpty } from 'class-validator';
 import { Product } from '../../products/entities/product.entity';
 import { Order } from './order.entity';
 
-@Table({ modelName: 'OrderItems' })
+@Table({ modelName: 'OrderItem' })
 export class OrderItem extends Model<OrderItem> {
   @ApiProperty({
     example: 1,
