@@ -15,11 +15,13 @@ import { v4 } from 'uuid';
 import { MailService } from '../mail/mail.service';
 import { LoginClientDto } from './dto/login-client.dto';
 import { log } from 'console';
+import { Admin } from '../admins/entities/admin.entity';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectModel(Client) private clientRepo: typeof Client,
+    @InjectModel(Admin) private adminRepo: typeof Admin,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
@@ -31,7 +33,7 @@ export class ClientsService {
     const existingUser = await this.clientRepo.findOne({
       where: { email },
     });
-    log(email)
+    log(email);
 
     if (existingUser) {
       throw new BadRequestException('The email is already in use');
@@ -145,24 +147,52 @@ export class ClientsService {
   // Handle client login
   async login(loginClientDto: LoginClientDto, res: Response) {
     const { email, password } = loginClientDto;
-    console.log("Keldi");
-    
+    console.log('Keldi');
 
     const client = await this.clientRepo.findOne({ where: { email } });
 
-    if (!client) throw new BadRequestException('Client not found');
+    if (!client) {
+      const admin = await this.adminRepo.findOne({ where: { email } });
+      if (!admin) throw new BadRequestException('Incorrect email or password');
+
+      const isMatch = await bcrypt.compare(password, admin.password);
+      if (!isMatch)
+        throw new BadRequestException('Incorrect email or password');
+
+      const tokens = await this.getTokensAdmin(admin);
+
+      const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+
+      const updatedAdmin = await this.adminRepo.update(
+        { refresh_token: hashedRefreshToken, is_active: true },
+        { where: { id: admin.id }, returning: true },
+      );
+
+      res.cookie('refresh_token', tokens.refreshToken, {
+        maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+        httpOnly: true,
+        secure: false, // false in development
+        sameSite: 'lax', // Required for cross-origin requests
+      });
+
+      // Send tokens in the response body
+      res.json({
+        message: 'Admin logged in',
+        admin: updatedAdmin[1][0],
+        tokens, // This should include accessToken and refreshToken
+      });
+    }
 
     if (!client.is_active)
       throw new BadRequestException('Client is not active');
-    
+
     console.log(password);
     console.log(client.password);
-    
-    
-    const isMatch = await bcrypt.compare(password, client.password);
-    console.log("Ismatch: ", isMatch);
 
-    if (!isMatch) throw new BadRequestException('Incorrect password');
+    const isMatch = await bcrypt.compare(password, client.password);
+    console.log('Ismatch: ', isMatch);
+
+    if (!isMatch) throw new BadRequestException('Incorrect email or password');
 
     const tokens = await this.getTokens(client);
 
@@ -189,6 +219,27 @@ export class ClientsService {
       tokens,
     };
     return response;
+  }
+  async getTokensAdmin(admin: Admin) {
+    const payload = {
+      id: admin.id,
+      is_active: admin.is_active,
+      is_creator: admin.is_creator,
+    };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: process.env.ACCESS_TOKEN_KEY_ADMIN,
+        expiresIn: process.env.ACCESS_TOKEN_TIME,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: process.env.REFRESH_TOKEN_KEY_ADMIN,
+        expiresIn: process.env.REFRESH_TOKEN_TIME,
+      }),
+    ]);
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async logOut(refreshToken: string, res: Response) {
