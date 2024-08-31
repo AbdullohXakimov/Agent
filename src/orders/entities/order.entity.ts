@@ -35,7 +35,7 @@ export class Order extends Model<Order> {
   @ForeignKey(() => Client)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
   clientId: number;
 

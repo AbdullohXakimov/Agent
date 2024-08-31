@@ -1,7 +1,16 @@
 <h1>Hello, {{name}}!</h1>
 <h2>Please click below to confirm that you took the products you ordered</h2>
-<p>
-  <a href="{{url}}">Confirm</a>
-</p>
 
-<p>If you did not take orders, you can safely ignore it.</p>
+<ul>
+  {{#each message}}
+    <li>
+      <strong>Product:</strong> {{this.productName}} <br>
+      <strong>Amount:</strong> {{this.amount}} <br>
+      <strong>Total Price:</strong> ${{this.totalPrice}}
+    </li>
+  {{/each}}
+</ul>
+
+<p><a href="{{url}}">Confirm</a></p>
+
+<p>If you did not take orders, you can safely ignore this message.</p>

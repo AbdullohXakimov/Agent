@@ -114,6 +114,8 @@ export class ClientsController {
     @Body() createClientDto: CreateClientDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log('Sign up:', createClientDto);
+
     return this.clientsService.create(createClientDto, res);
   }
 

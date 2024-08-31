@@ -121,7 +121,7 @@ export class AdminsController {
     description: 'The admin has been successfully created',
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   @Post()
   @HttpCode(201)
   create(@Body() createAdminDto: CreateAdminDto) {

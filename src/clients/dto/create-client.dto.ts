@@ -31,12 +31,13 @@ export class CreateClientDto {
     description: 'Address of the client',
   })
   @IsString()
-  @IsNotEmpty()
   readonly address: string;
 
   @ApiProperty({
     example: 'password123',
     description: 'Password of the client',
   })
-  password: string;
+  @IsString()
+  @IsNotEmpty()
+  readonly password: string;
 }

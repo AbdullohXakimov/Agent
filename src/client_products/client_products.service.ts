@@ -112,64 +112,21 @@ export class ClientProductsService {
     if (!clientProduct) {
       throw new NotFoundException(`ClientProduct with ID ${id} not found`);
     }
-
-    // Ensure that the requesting client is the owner of the clientProduct or an admin
-    console.log("Something!!");
-    
     if (clientProduct.clientId !== user.id) {
       throw new ForbiddenException(
         'You are not allowed to update this product.',
       );
     }
 
-    // Fetch the product that the client is related to
-    const product = await this.productModel.findByPk(clientProduct.productId);
-    if (!product) {
-      throw new NotFoundException(
-        `Product with ID ${clientProduct.productId} not found`,
-      );
-    }
+    // Reduce the client's product amount without affecting the base stock
+    if (clientProduct.amount < updateClientProductDto.amount)
+      throw new BadRequestException("You should order to add product")
+    if (updateClientProductDto.amount >= 0)
+    clientProduct.amount = updateClientProductDto.amount;
+  else throw new BadRequestException("Amount can't be less than 0")
 
-    // Get the amount change (e.g., +100 or -200)
-    const changeInAmount = updateClientProductDto.amount;
-    console.log("CHANGE AMOUNT",changeInAmount);
-    console.log(updateClientProductDto);
-    
-    
-
-    if (changeInAmount > 0) {
-      // If the amount is positive, we are adding to the client's shop
-      // Check if the product has enough stock to fulfill the update
-      if (product.amount < changeInAmount) {
-        throw new BadRequestException(
-          'Not enough stock available for the product',
-        );
-      }
-
-      // Update the client's product and reduce the base stock
-      clientProduct.amount += changeInAmount;
-      product.amount -= changeInAmount;
-    } else if (changeInAmount < 0) {
-      // If the amount is negative, we are removing from the client's shop
-      const absoluteChange = Math.abs(changeInAmount);
-
-      // Check if the client has enough stock to remove
-      if (clientProduct.amount < absoluteChange) {
-        throw new BadRequestException(
-          "Not enough stock available in the client's shop",
-        );
-      }
-
-      // Reduce the client's product amount without affecting the base stock
-      clientProduct.amount -= absoluteChange;
-    }
-
-    // Save the updated client and product models
-    await product.save();
     await clientProduct.save();
     console.log(clientProduct.amount);
-
-    
 
     return clientProduct;
   }

@@ -33,7 +33,7 @@ export class ClientProduct extends Model<ClientProduct> {
   @ForeignKey(() => Client)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
   clientId: number;
 
@@ -46,7 +46,7 @@ export class ClientProduct extends Model<ClientProduct> {
   @ForeignKey(() => Product)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
   productId: number;
 

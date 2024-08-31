@@ -1,8 +1,30 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean } from 'class-validator';
+import {
+  IsBoolean,
+  IsArray,
+  ValidateNested,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class UpdateOrderItemDTO {
+  @IsNumber()
+  productId: number;
+
+  @IsNumber()
+  amount: number;
+
+  @IsNumber()
+  totalPrice: number;
+}
 
 export class UpdateOrderStatusDTO {
-  @ApiProperty({ example: true })
   @IsBoolean()
-  finished: boolean;
+  full: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateOrderItemDTO)
+  items?: UpdateOrderItemDTO[];
 }

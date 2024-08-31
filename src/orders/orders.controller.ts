@@ -50,6 +50,8 @@ export class OrderController {
     @Param('id') id: number,
     @Body() updateOrderStatusDTO: UpdateOrderStatusDTO,
   ): Promise<Order> {
+    console.log("Nima: ", updateOrderStatusDTO);
+    
     return this.orderService.updateOrderStatus(id, updateOrderStatusDTO);
   }
 

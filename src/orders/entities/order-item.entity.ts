@@ -33,7 +33,7 @@ export class OrderItem extends Model<OrderItem> {
   @ForeignKey(() => Order)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
   orderId: number;
 
@@ -46,7 +46,7 @@ export class OrderItem extends Model<OrderItem> {
   @ForeignKey(() => Product)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
   productId: number;
 
@@ -61,6 +61,19 @@ export class OrderItem extends Model<OrderItem> {
     allowNull: false,
   })
   amount: number;
+
+  @ApiProperty({
+    example: 5,
+    description: 'Amount of the product received',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  amountReceived: number;
 
   @ApiProperty({
     example: 50,
